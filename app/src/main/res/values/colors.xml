@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3B5998</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="black">#111111</color>
+    <color name="white">#FFFFFF</color>
+    <color name="colortest">#66CD00</color>
+    <color name="colortest2">#458B00</color>
+    <color name="colorblue">#0066ab</color>
+    <color name="gray">#C8C8C8</color>
+    <color name="Gainsboro">#DCDCDC</color>
+    <color name="pink">#F93996</color>
+    <color name="pink1">#F07D80</color>
+    <color name="facebook">#416BC1</color>
+</resources>
