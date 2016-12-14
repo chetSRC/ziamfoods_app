@@ -1,74 +1,111 @@
 package com.revenue_express.ziamfoods.adapter;
 
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.revenue_express.ziamfoods.R;
-import com.revenue_express.ziamfoods.dao.ReviewsItemDao;
-import com.revenue_express.ziamfoods.dao.ReviewsListItemDao;
-import com.revenue_express.ziamfoods.manager.ReviewsListManager;
-import com.revenue_express.ziamfoods.view.ReviewsListItem;
+import com.revenue_express.ziamfoods.dao.ReviewsDataDao;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
 
 /**
  * Created by ChetPC on 12/8/2016.
  */
 public class ReviewsAdapter extends BaseAdapter {
-    ReviewsListItemDao dao;
-    int lastPosition = -1;
+    Bitmap mBitmap;
+    private LayoutInflater mInflater;
+    List<ReviewsDataDao> mData;
+    private ViewHolder mViewHolder;
 
-
-
+    public ReviewsAdapter(Activity activity, List<ReviewsDataDao> data) {
+        mInflater = (LayoutInflater) activity.getSystemService(
+                Context.LAYOUT_INFLATER_SERVICE);
+        mData = data;
+    }
 
     @Override
     public int getCount() {
-        if (ReviewsListManager.getInstance().getDao() == null)
-            return 0;
-        if (ReviewsListManager.getInstance().getDao().getData() == null)
-            return 0;
-        return ReviewsListManager.getInstance().getDao().getData().size();
+        return mData.size();
     }
 
     @Override
     public Object getItem(int position) {
-
-        return ReviewsListManager.getInstance().getDao().getData().get(position);
+        return mData.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ReviewsListItem item;
-        if (convertView != null)
-            item = (ReviewsListItem) convertView;
-        else
-            item = new ReviewsListItem(parent.getContext());
-        ReviewsItemDao dao = (ReviewsItemDao) getItem(position);
+        if (convertView == null) {
+            convertView = mInflater.inflate(R.layout.item_reviews1, parent, false);
+            mViewHolder = new ViewHolder();
+            mViewHolder.imgUser = (ImageView) convertView.findViewById(R.id.imgUser);
+            mViewHolder.tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
+            mViewHolder.tvDetail = (TextView) convertView.findViewById(R.id.tvDetail);
+            mViewHolder.tvRating = (TextView) convertView.findViewById(R.id.tvRating);
+            mViewHolder.tvDate = (TextView) convertView.findViewById(R.id.tvDate);
+            mViewHolder.tvUser = (TextView) convertView.findViewById(R.id.tvUser);
 
-        item.setTvName(dao.getName());
-        item.setTvTitle(dao.getTitle());
-        item.setTvDetail(dao.getDetail());
-        item.setTvRating(dao.getScore());
-//        item.setRatingBar(dao.getScore());
+            convertView.setTag(mViewHolder);
+
+        } else {
+            mViewHolder = (ViewHolder) convertView.getTag();
+        }
+
+        final ReviewsDataDao mDatas = mData.get(position);
+
+        if (mDatas.getMemh_pictureUrl() != null) {
+
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        URL url = new URL(mDatas.getMemh_pictureUrl());
+                        mBitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+
+                    } catch (MalformedURLException e) {
+
+                    } catch (IOException e) {
+
+                    }
+                    return null;
+                }
+            }.execute();
 
 
-        if (position > lastPosition){
-            Animation anim = AnimationUtils.loadAnimation(parent.getContext(),
-                    R.anim.up_from_bottom);
-            item.startAnimation(anim);
-            lastPosition = position;
+
+            mViewHolder.imgUser.setImageBitmap(mBitmap);
         }
 
 
-        return item;
+        mViewHolder.tvTitle.setText(mDatas.getBsrh_title());
+        mViewHolder.tvDetail.setText(mDatas.getBsrh_desc());
+        mViewHolder.tvDate.setText(mDatas.getBsrh_cdate());
+        mViewHolder.tvUser.setText(mDatas.getMemh_display());
+        mViewHolder.tvRating.setText(mDatas.getBsrh_score());
 
+        return convertView;
+    }
 
+    private static class ViewHolder {
+        ImageView imgUser;
+        TextView tvUser,tvDate,tvRating,tvTitle,tvDetail;
     }
 
     }

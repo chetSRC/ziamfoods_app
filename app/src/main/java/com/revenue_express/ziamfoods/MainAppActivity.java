@@ -79,30 +79,30 @@ public class MainAppActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        LV_Review = (ListView)findViewById(R.id.LV_Review);
-        listAdepter = new ReviewsAdapter();
-        LV_Review.setAdapter((ListAdapter) listAdepter);
-        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipeRefreshLayout);
+//        LV_Review = (ListView)findViewById(R.id.LV_Review);
+//        listAdepter = new ReviewsAdapter();
+//        LV_Review.setAdapter((ListAdapter) listAdepter);
+//        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipeRefreshLayout);
 
-        reloadData();
-
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                reloadData();
-            }
-        });
-        LV_Review.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                swipeRefreshLayout.setEnabled(firstVisibleItem == 0);
-            }
-        });
+//        reloadData();
+//
+//        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                reloadData();
+//            }
+//        });
+//        LV_Review.setOnScrollListener(new AbsListView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(AbsListView view, int scrollState) {
+//
+//            }
+//
+//            @Override
+//            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+//                swipeRefreshLayout.setEnabled(firstVisibleItem == 0);
+//            }
+//        });
 
         // handler to set duration and to upate animation
         final Handler mHandler = new Handler();
@@ -219,84 +219,6 @@ public class MainAppActivity extends AppCompatActivity
             }
         }.execute();
 
-
-//      Get AsyncTask Review Url
-//        new AsyncTask<Void, Void, String>() {
-//
-//            @Override
-//            protected String doInBackground(Void... voids) {
-//                OkHttpClient okHttpClient = new OkHttpClient();
-//
-//                Request.Builder builder = new Request.Builder();
-//
-//                Request request_review = builder.url(URL_Review).build();
-//
-//                try {
-//                    okhttp3.Response response = okHttpClient.newCall(request_review).execute();
-//                    if (response.isSuccessful()) {
-//                        return response.body().string();
-//                    } else {
-//                        return "Not Success - code : " + response.code();
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    return "Error - " + e.getMessage();
-//                }
-//            }
-//
-//            @Override
-//            protected void onPostExecute(String string) {
-//                super.onPostExecute(string);
-//                try {
-//
-//                    JSONObject jsnobject = new JSONObject(string);
-//                    JSONArray jArray = jsnobject.getJSONArray("data");
-//
-////                  Data review
-//                    for (int i = 0; i < jArray.length(); i++) {
-//                        JSONObject actor = jArray.getJSONObject(i);
-//
-//
-//                        ImageView imgView = new ImageView(getApplicationContext()); //create imageview dynamically
-//                        Picasso.with(getApplicationContext()).load(R.drawable.banner1).into(imgView);
-//
-//                        TextView textView = new TextView(getApplicationContext());//create textview dynamically
-//                        bsrh_title = String.valueOf(actor.getString("bsrh_title"));
-//                        textView.setText(bsrh_title);
-//
-//                        bsrh_desc = String.valueOf(actor.getString("bsrh_desc"));
-//                        textView.setText(bsrh_desc);
-//
-//                        bsrh_score = String.valueOf(actor.getString("bsrh_score"));
-//                        textView.setText(bsrh_score);
-//
-//                        memh_firstname = String.valueOf(actor.getString("memh_firstname"));
-//                        textView.setText(memh_firstname);
-//
-//                        RelativeLayout rl = new RelativeLayout(getApplicationContext());
-//                        RelativeLayout.LayoutParams lp;
-//                        lp = new RelativeLayout.LayoutParams(400, RelativeLayout.LayoutParams.WRAP_CONTENT);
-//
-//                        RelativeLayout.LayoutParams lp1;
-//                        lp1 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-//
-//                        rl.setLayoutParams(lp1);
-//                        imgView.setLayoutParams(lp);
-//                        textView.setLayoutParams(lp);
-//
-//                        rl.addView(imgView);//add imageview to relativelayout
-//                        rl.addView(textView);//add textView to relativelayout
-//                        RelativeLayout layout =(RelativeLayout) findViewById(R.id.ll_review);
-//
-//                        layout.addView(rl);
-//                    }
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//        }.execute();
 
     }
 
