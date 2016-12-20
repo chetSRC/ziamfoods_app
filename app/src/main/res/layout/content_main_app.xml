@@ -4,18 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="4dp"
-    android:paddingRight="4dp"
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.revenue_express.ziamfoods.MainAppActivity"
-    tools:showIn="@layout/app_bar_main_app"
-    android:weightSum="4">
+    tools:showIn="@layout/app_bar_main_app">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_weight="1"
         android:fillViewport="true"
         android:nestedScrollingEnabled="true"
         >
@@ -62,19 +59,27 @@
         </LinearLayout>
 
     </ScrollView>
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:layout_weight="1"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:id="@+id/swipeRefreshLayout">
-        <ListView
-            android:orientation="horizontal"
-            android:id="@+id/LV_Review"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:verticalSpacing="10dp"
-            android:horizontalSpacing="10dp"
-            >
-        </ListView>
-    </android.support.v4.widget.SwipeRefreshLayout>
+   <LinearLayout
+       android:orientation="horizontal"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content">
+       <Button
+           android:id="@+id/btnDeal"
+           android:background="@color/colorPrimary"
+           android:layout_weight="1"
+           android:layout_width="0dp"
+           android:layout_height="50dp"
+           android:text="Deal"
+           android:textColor="@color/white"
+           android:textSize="20dp"/>
+       <Button
+           android:id="@+id/btnNearBy"
+           android:background="@color/colorPrimary"
+           android:layout_weight="1"
+           android:layout_width="0dp"
+           android:layout_height="50dp"
+           android:text="NearBy"
+           android:textColor="@color/white"
+           android:textSize="20dp"/>
+   </LinearLayout>
 </LinearLayout>

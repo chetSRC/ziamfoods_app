@@ -1,12 +1,19 @@
 package com.revenue_express.ziamfoods;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +26,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -40,6 +48,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -51,16 +60,27 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainAppActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
 
-    ListView LV_Review ;
+    ListView LV_Review;
     ReviewsAdapter listAdepter;
     SwipeRefreshLayout swipeRefreshLayout;
     ReviewsListItemDao dao;
-    String bssh_title,bsrh_desc,bsrh_score,memh_firstname,bsrh_title;
+    String bssh_title, bsrh_desc, bsrh_score, memh_firstname, bsrh_title;
     ArrayList<String> actorsList = new ArrayList<String>();
 
     ViewFlipper simpleViewFlipper;
+
+    protected LocationManager locationManager;
+    protected LocationListener locationListener;
+    protected Context context;
+    TextView txtLat;
+    String lat;
+    String provider;
+    protected String latitude, longitude;
+    protected boolean gps_enabled, network_enabled;
+
+    Button btnNearBy,btndeal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,33 +98,6 @@ public class MainAppActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-//        LV_Review = (ListView)findViewById(R.id.LV_Review);
-//        listAdepter = new ReviewsAdapter();
-//        LV_Review.setAdapter((ListAdapter) listAdepter);
-//        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipeRefreshLayout);
-
-//        reloadData();
-//
-//        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                reloadData();
-//            }
-//        });
-//        LV_Review.setOnScrollListener(new AbsListView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(AbsListView view, int scrollState) {
-//
-//            }
-//
-//            @Override
-//            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-//                swipeRefreshLayout.setEnabled(firstVisibleItem == 0);
-//            }
-//        });
-
-        // handler to set duration and to upate animation
         final Handler mHandler = new Handler();
 
         // Create runnable for posting
@@ -178,7 +171,7 @@ public class MainAppActivity extends AppCompatActivity
                         ImageView imgView = new ImageView(getApplicationContext()); //create imageview dynamically
                         JSONObject actor = jArray.getJSONObject(i);
                         String bssh_imghead = String.valueOf(actor.getString("image"));
-                        Picasso.with(getApplicationContext()).load("http://www.ziamthai.com/admin/"+bssh_imghead).into(imgView);
+                        Picasso.with(getApplicationContext()).load("http://www.ziamthai.com/admin/" + bssh_imghead).into(imgView);
                         TextView textView = new TextView(getApplicationContext());//create textview dynamically
                         bssh_title = String.valueOf(actor.getString("name"));
                         textView.setText(bssh_title);
@@ -194,19 +187,19 @@ public class MainAppActivity extends AppCompatActivity
                         textView.setLayoutParams(lp);
 
                         rl.addView(imgView);//add imageview to relativelayout
-                        LinearLayout layout =(LinearLayout) findViewById(R.id.ll_all);
+                        LinearLayout layout = (LinearLayout) findViewById(R.id.ll_all);
 
                         layout.addView(rl);
                         rl.setOnClickListener(new View.OnClickListener() {
                             public void onClick(View v) {
-                                Toast.makeText(getApplicationContext(),"Show ID Shop"+bssh_title,
+                                Toast.makeText(getApplicationContext(), "Show ID Shop" + bssh_title,
                                         Toast.LENGTH_SHORT).show();
                             }
                         });
 
                         rl.setOnClickListener(new View.OnClickListener() {
                             public void onClick(View v) {
-                                Toast.makeText(getApplicationContext(),"Show ID Shop"+bssh_title,
+                                Toast.makeText(getApplicationContext(), "Show ID Shop" + bssh_title,
                                         Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -220,6 +213,30 @@ public class MainAppActivity extends AppCompatActivity
         }.execute();
 
 
+        //// get location ////
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
+
+        btnNearBy = (Button)findViewById(R.id.btnNearBy);
+        btnNearBy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), NearByActivity.class);
+                intent.putExtra("POS",latitude+","+longitude);
+                startActivity(intent);
+            }
+        });
     }
 
     private void setFlipperImage(ArrayList<String> actorsList) {
@@ -319,6 +336,7 @@ public class MainAppActivity extends AppCompatActivity
             startActivity(intent);
         } else if (id == R.id.nav_slideshow) {
             Intent intent = new Intent(getApplicationContext(), NearByActivity.class);
+            intent.putExtra("POS",latitude+","+longitude);
             startActivity(intent);
         } else if (id == R.id.nav_manage) {
             Intent intent = new Intent(getApplicationContext(), ContactActivity.class);
@@ -328,5 +346,35 @@ public class MainAppActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    /// get location ///
+
+    @Override
+    public void onLocationChanged(Location location) {
+//        txtLat = (TextView) findViewById(R.id.textview1);
+//        txtLat.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
+
+
+        Toast.makeText(MainAppActivity.this, "Latitude:" +  new DecimalFormat("0.00000").format(location.getLatitude()) + ", Longitude:" + new DecimalFormat("0.00000").format(location.getLongitude()), Toast.LENGTH_SHORT).show();
+//        new DecimalFormat("0.00").format(location.getLongitude());
+        latitude = new DecimalFormat("0.00000").format(location.getLatitude());
+        longitude = new DecimalFormat("0.00000").format(location.getLongitude());
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.d("Latitude","status");
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Log.d("Latitude","enable");
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Log.d("Latitude","disable");
     }
 }
